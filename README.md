@@ -1,4 +1,8 @@
 # Chat
+
+![Node.js CI](https://github.com/aerabi/chat/actions/workflows/ci.yaml/badge.svg)
+
+
 A chat application using NestJS. The backend application has the following modules:
 
 - Users: to create and list users
