@@ -1,0 +1,26 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "Chat backend based on Node.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aerabi/chat.git"
+  },
+  "author": "Mohammad-Ali A'râbi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aerabi/chat/issues"
+  },
+  "homepage": "https://github.com/aerabi/chat#readme",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.11",
+    "express": "^4.19.2",
+    "typescript": "^5.5.3"
+  }
+}
