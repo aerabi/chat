@@ -17,6 +17,7 @@ Also, as we're not using a WebSocket server, but that's only a matter of adding 
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
+- [Running with Docker Compose](#running-with-docker-compose)
 - [Installation](#installation)
 - [Running the app](#running-the-app)
 - [Test](#test)
@@ -27,6 +28,17 @@ Also, as we're not using a WebSocket server, but that's only a matter of adding 
   - [Test the application](#test-the-application)
 - [Improvements](#improvements)
 - [Conclusion](#conclusion)
+
+## Running with Docker Compose
+
+To run the application with Docker Compose, you need to have Docker installed. 
+Then, run:
+
+```bash
+$ docker compose up --build
+```
+
+Your application will be available at http://localhost:3000.
 
 ## Installation
 
