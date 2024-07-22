@@ -328,3 +328,275 @@ const module: TestingModule = await Test.createTestingModule({
 }).compile();
 ```
 
+### Create a session module
+
+A chat session is a conversation between users. Let's create a module for sessions. We'll use it to create and list sessions.
+
+```bash
+$ nest generate module sessions
+```
+
+Then, let's create a controller and a service for the sessions:
+
+```bash
+$ nest generate controller sessions
+$ nest generate service sessions
+```
+
+Now we need a model for the sessions. Let's create a file `session.model.ts` in the `sessions` folder:
+
+```typescript
+import { Message } from "../messages/message.model";
+
+export interface Session {
+  id: number;
+  userIds: number[];
+  messages: Message[];
+}
+```
+
+Here, the session supports two users or more. This session will also contain a few messages.
+
+Now, the sessions service should have the following functionalities:
+
+- Create a new session
+- Add a message to a session
+- List all sessions
+- List all messages in a session
+
+Here, we'll create a repository layer, as things are getting more complex. Let's create a file `sessions.repository.array.ts` in the `sessions` folder:
+
+```typescript
+import { Injectable } from '@nestjs/common';
+
+import { Session } from './session.model';
+import { Message } from "../messages/message.model";
+
+@Injectable()
+export class SessionsArrayRepository {
+  private sessions: Session[] = [];
+
+  create(userIds: number[]): Session {
+    const session: Session = {
+      id: this.sessions.length + 1,
+      userIds,
+      messages: [],
+    };
+
+    this.sessions.push(session);
+
+    return session;
+  }
+
+  addMessage(sessionId: number, message: Message) {
+    const session = this.sessions.find(s => s.id === sessionId);
+
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    session.messages.push(message);
+  }
+
+  findAll(): Session[] {
+    return this.sessions;
+  }
+
+  findMessages(sessionId: number): Message[] {
+    const session = this.sessions.find(s => s.id === sessionId);
+
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    return session.messages;
+  }
+}
+```
+
+As we're going to replace this repository with a real one later, let's create an interface for the repository. 
+Create a file `sessions.repository.ts` in the `sessions` folder:
+
+```typescript
+import { Session } from "./session.model";
+import { Message } from "../messages/message.model";
+
+export interface ISessionsRepository {
+  create(userIds: number[]): Session;
+  addMessage(sessionId: number, message: Message): void;
+  findAll(): Session[];
+  findMessages(sessionId: number): Message[];
+}
+
+export const ISessionsRepository = Symbol('ISessionsRepository');
+```
+
+We created a symbol to use as a token for the repository, when we inject it into the service, because the interface is not a real object and cannot be used as a token.
+
+Now, let the array repository implement this interface:
+
+```typescript
+export class SessionsRepositoryArray implements ISessionsRepository {
+  // ...
+}
+```
+
+Awesome! Now, let's create a service for the sessions. Here is the `sessions.service.ts` file:
+
+```typescript
+import { Injectable, Inject } from '@nestjs/common';
+
+import { Session } from './session.model';
+import { SessionsRepositoryInterface } from './sessions.repository.interface';
+import { Message } from "../messages/message.model";
+
+@Injectable()
+export class SessionsService {
+  constructor(@Inject(ISessionsRepository) private readonly sessionsRepository: SessionsRepositoryInterface) {}
+
+  create(userIds: number[]): Session {
+    return this.sessionsRepository.create(userIds);
+  }
+
+  addMessage(sessionId: number, message: Message) {
+    this.sessionsRepository.addMessage(sessionId, message);
+  }
+
+  findAll(): Session[] {
+    return this.sessionsRepository.findAll();
+  }
+
+  findMessages(sessionId: number): Message[] {
+    return this.sessionsRepository.findMessages(sessionId);
+  }
+}
+```
+
+Here, we're injecting the repository into the service using the manually created token. This way, we can easily replace the repository with a real one later.
+Actually, we don't need to change the code in the service file when we replace the repository, only the module file.
+Let's add the provider to the `sessions.module.ts` file:
+
+```typescript
+import { Module } from '@nestjs/common';
+
+import { SessionsController } from './sessions.controller';
+import { SessionsService } from './sessions.service';
+import { SessionsRepositoryArray } from './sessions.array.repository';
+
+@Module({
+  controllers: [SessionsController],
+  providers: [
+    SessionsService,
+    {
+      provide: ISessionsRepository,  // this is the token
+      useClass: SessionsArrayRepository,  // this is the implementation
+    },
+  ],
+})
+export class SessionsModule {}
+```
+
+Let's add the tests for the service:
+
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { SessionsService } from './sessions.service';
+import { SessionsRepositoryArray } from "./sessions.array.repository";
+
+describe('SessionsService', () => {
+  let service: SessionsService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SessionsService,
+        {
+          provide: ISessionsRepository,
+          useClass: SessionsArrayRepository,
+        },
+      ],
+    }).compile();
+
+    service = module.get<SessionsService>(SessionsService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  // new test cases are here
+  it('should create a session', () => {
+    const session = service.create([1, 2]);
+
+    expect(session.id).toBe(1);
+    expect(session.userIds).toEqual([1, 2]);
+    expect(session.messages).toEqual([]);
+  });
+
+  it('should add a message to a session', () => {
+    const session = service.create([1, 2]);
+    const message = { id: 1, text: 'Hello, world!', userId: 1 };
+
+    service.addMessage(session.id, message);
+
+    expect(session.messages.length).toBe(1);
+    expect(session.messages[0].text).toBe('Hello, world!');
+  });
+
+  it('should return all sessions', () => {
+    service.create([1, 2]);
+    service.create([2, 3]);
+
+    const sessions = service.findAll();
+
+    expect(sessions.length).toBe(2);
+    expect(sessions[0].userIds).toEqual([1, 2]);
+    expect(sessions[1].userIds).toEqual([2, 3]);
+  });
+
+  it('should return all messages in a session', () => {
+    const session = service.create([1, 2]);
+    service.addMessage(session.id, { id: 1, text: 'Hello, world!', userId: 1 });
+    service.addMessage(session.id, { id: 2, text: 'Hi, there!', userId: 2 });
+
+    const messages = service.findMessages(session.id);
+
+    expect(messages.length).toBe(2);
+    expect(messages[0].text).toBe('Hello, world!');
+    expect(messages[1].text).toBe('Hi, there!');
+  });
+});
+```
+
+What's left is the controller. Here is the `sessions.controller.ts` file:
+
+```typescript
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+
+import { SessionsService } from './sessions.service';
+
+@Controller('sessions')
+export class SessionsController {
+  constructor(private readonly sessionsService: SessionsService) {}
+
+  @Post()
+  create(@Body('userIds') userIds: number[]) {
+    return this.sessionsService.create(userIds);
+  }
+
+  @Post(':sessionId/messages')
+  addMessage(@Body('text') text: string, @Body('userId') userId: number, @Param('sessionId') sessionId: number) {
+    return this.sessionsService.addMessage(sessionId, { id: 0, text, userId });
+  }
+
+  @Get()
+  findAll() {
+    return this.sessionsService.findAll();
+  }
+
+  @Get(':sessionId/messages')
+  findMessages(@Param('sessionId') sessionId: number) {
+    return this.sessionsService.findMessages(sessionId);
+  }
+}
+```
