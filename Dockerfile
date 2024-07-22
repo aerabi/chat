@@ -70,3 +70,6 @@ EXPOSE 3000
 
 # Run the application.
 CMD npm run start:prod
+
+# Add a healthcheck to verify that the application is running.
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:3000 || exit 1
