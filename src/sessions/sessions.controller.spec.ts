@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SessionsController } from './sessions.controller';
 import { SessionsArrayRepository } from './sessions.repository.array';
 import { ISessionsRepository } from './sessions.repository';
-import { SessionsService } from "./sessions.service";
+import { SessionsService } from './sessions.service';
 
 describe('SessionsController', () => {
   let controller: SessionsController;

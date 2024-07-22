@@ -17,7 +17,11 @@ export class SessionsController {
     @Param('sessionId') sessionId: number,
   ) {
     const sessionIdNumber = Number(sessionId);
-    return this.sessionsService.addMessage(sessionIdNumber, { id: 0, text, userId });
+    return this.sessionsService.addMessage(sessionIdNumber, {
+      id: 0,
+      text,
+      userId,
+    });
   }
 
   @Get()
