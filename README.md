@@ -1,5 +1,32 @@
 # Chat
-A chat application using NestJS
+A chat application using NestJS. The backend application has the following modules:
+
+- Users: to create and list users
+- Messages: containing the type definition for messages
+- Sessions: to create and list chat sessions and add messages to them
+
+Each module has three layers:
+
+- Controller: to handle the HTTP requests
+- Service: to handle the business logic
+- Repository: to handle the data storage
+
+Currently, the application uses in-memory storage for the users and chat sessions. Later, we can replace this with a real database easily.
+Also, as we're not using a WebSocket server, but that's only a matter of adding a new controller.
+
+## Table of contents
+
+- [Table of contents](#table-of-contents)
+- [Installation](#installation)
+- [Running the app](#running-the-app)
+- [Test](#test)
+- [Project creation](#project-creation)
+  - [Create a users module](#create-a-users-module)
+  - [Create a messages module](#create-a-messages-module)
+  - [Create a session module](#create-a-session-module)
+  - [Test the application](#test-the-application)
+- [Improvements](#improvements)
+- [Conclusion](#conclusion)
 
 ## Installation
 
@@ -507,3 +534,55 @@ Don't forget to add the provider to the tests for the controller:
       ],
     }).compile();
 ```
+
+### Test the application
+
+Now, let's test the application. First, let's run the application:
+
+```bash
+$ npm run start
+```
+
+Then, let's create two users:
+
+```bash
+$ curl -X POST http://localhost:3000/users -H 'Content-Type: application/json' -d '{"name": "John Doe"}'
+$ curl -X POST http://localhost:3000/users -H 'Content-Type: application/json' -d '{"name": "Jane Doe"}'
+```
+
+Now, let's create a session with these two users:
+
+```bash
+$ curl -X POST http://localhost:3000/sessions -H 'Content-Type: application/json' -d '{"userIds": [1, 2]}'
+```
+
+Now, let's add a message to the session:
+
+```bash
+$ curl -X POST http://localhost:3000/sessions/1/messages -H 'Content-Type: application/json' -d '{"text": "Hello, world!", "userId": 1}'
+```
+
+Now, let's list all messages in the session:
+
+```bash
+$ curl http://localhost:3000/sessions/1/messages
+```
+
+## Improvements
+
+The following improvements can be made:
+
+- Add a repository for the users
+- Add a repository for the sessions that would write into MongoDB
+- Add authentication
+- Change the IDs to UUIDs
+- Add a frontend
+- Add a WebSocket server (the chat is not real-time yet)
+
+Adding a WebSocket server should be only a matter of adding a new controller, and adding persistent storage should be only a matter of 
+creating a new repository and changing the provider in the module file.
+
+## Conclusion
+
+We created a chat application using NestJS. We created modules for users, messages, and sessions. We created repositories for the sessions and messages.
+As we're not using a WebSocket server, the chat is not real-time yet, and the frontend should poll the server to get new messages.
