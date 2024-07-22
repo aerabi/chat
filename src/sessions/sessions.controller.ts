@@ -16,7 +16,8 @@ export class SessionsController {
     @Body('userId') userId: number,
     @Param('sessionId') sessionId: number,
   ) {
-    return this.sessionsService.addMessage(sessionId, { id: 0, text, userId });
+    const sessionIdNumber = Number(sessionId);
+    return this.sessionsService.addMessage(sessionIdNumber, { id: 0, text, userId });
   }
 
   @Get()
@@ -26,6 +27,7 @@ export class SessionsController {
 
   @Get(':sessionId/messages')
   findMessages(@Param('sessionId') sessionId: number) {
-    return this.sessionsService.findMessages(sessionId);
+    const sessionIdNumber = Number(sessionId);
+    return this.sessionsService.findMessages(sessionIdNumber);
   }
 }
