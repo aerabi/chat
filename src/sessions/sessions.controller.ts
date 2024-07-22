@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { SessionsService } from "./sessions.service";
+import { SessionsService } from './sessions.service';
 
 @Controller('sessions')
 export class SessionsController {
@@ -11,7 +11,11 @@ export class SessionsController {
   }
 
   @Post(':sessionId/messages')
-  addMessage(@Body('text') text: string, @Body('userId') userId: number, @Param('sessionId') sessionId: number) {
+  addMessage(
+    @Body('text') text: string,
+    @Body('userId') userId: number,
+    @Param('sessionId') sessionId: number,
+  ) {
     return this.sessionsService.addMessage(sessionId, { id: 0, text, userId });
   }
 

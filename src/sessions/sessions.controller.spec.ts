@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SessionsController } from './sessions.controller';
+import { SessionsArrayRepository } from './sessions.repository.array';
+import { ISessionsRepository } from './sessions.repository';
+import { SessionsService } from "./sessions.service";
 
 describe('SessionsController', () => {
   let controller: SessionsController;
@@ -7,6 +10,13 @@ describe('SessionsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SessionsController],
+      providers: [
+        SessionsService,
+        {
+          provide: ISessionsRepository,
+          useClass: SessionsArrayRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<SessionsController>(SessionsController);

@@ -5,7 +5,10 @@ import { ISessionsRepository } from './sessions.repository';
 
 @Injectable()
 export class SessionsService {
-  constructor(@Inject(ISessionsRepository) private readonly sessionsRepository: ISessionsRepository) {}
+  constructor(
+    @Inject(ISessionsRepository)
+    private readonly sessionsRepository: ISessionsRepository,
+  ) {}
 
   create(userIds: number[]): Session {
     return this.sessionsRepository.create(userIds);

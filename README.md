@@ -492,3 +492,18 @@ export class SessionsController {
   }
 }
 ```
+
+Don't forget to add the provider to the tests for the controller:
+
+```typescript
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [SessionsController],
+      providers: [
+        SessionsService,
+        {
+          provide: ISessionsRepository,
+          useClass: SessionsArrayRepository,
+        },
+      ],
+    }).compile();
+```
