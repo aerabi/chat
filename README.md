@@ -3,7 +3,10 @@
 ![Node.js CI](https://github.com/aerabi/chat/actions/workflows/ci.yaml/badge.svg)
 
 
-A chat application using NestJS. The backend application has the following modules:
+A general-purpose chat application written in Node.js using NestJS. 
+This backend can be used with a special-purpose frontend like creating a customer support chat, an AI chatbot, or a chat application for a social network.
+
+The backend application has the following modules:
 
 - Users: to create and list users
 - Messages: containing the type definition for messages
@@ -17,6 +20,17 @@ Each module has three layers:
 
 Currently, the application uses in-memory storage for the users and chat sessions. Later, we can replace this with a real database easily.
 Also, as we're not using a WebSocket server, but that's only a matter of adding a new controller.
+
+## Connection to the frontend
+
+There is a frontend application that lives [here](https://github.com/aerabi/chat-frontend). The frontend is an Angular application that connects to this backend to create a chat application.
+Here is how the frontend connects to the backend:
+
+![Sequence diagram](./img/sequence.png)
+
+The frotend application keeps polling the backend to get new messages. The backend application is stateless and does not keep track of the messages that have been sent to the frontend.
+
+![Actors diagram](./img/sequence.actors.png)
 
 ## Table of contents
 

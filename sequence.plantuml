@@ -1,0 +1,10 @@
+@startuml
+Front->Back: create new user
+Back-->Front: user created
+Front->Back: create new chat session
+Back-->Front: chat session created
+Front->Back: send message
+Back-->Front: message sent
+Front->Back: get messages
+Back-->Front: messages
+@enduml

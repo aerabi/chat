@@ -1,0 +1,14 @@
+@startuml
+actor Alice
+actor Bob
+participant Backend
+
+Bob -> Backend: GET /sessions/:id/messages
+Backend --> Bob: 200 OK (all messages, no new messages)
+
+Alice -> Backend: POST /sessions/:id/messages
+Backend --> Alice: 201 Created (new message)
+
+Bob -> Backend: GET /sessions/:id/messages
+Backend --> Bob: 200 OK (all messages, new message)
+@enduml
