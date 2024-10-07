@@ -616,3 +616,4 @@ creating a new repository and changing the provider in the module file.
 
 We created a chat application using NestJS. We created modules for users, messages, and sessions. We created repositories for the sessions and messages.
 As we're not using a WebSocket server, the chat is not real-time yet, and the frontend should poll the server to get new messages.
+
